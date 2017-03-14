@@ -142,7 +142,10 @@ abstract class AbstractMySQLBinaryLogConsumer
       Future { client.connect() }
 
       val startTime = Platform.currentTime
-      while (Platform.currentTime - startTime < 10000 && !connected) Thread.sleep(10)
+      while (Platform.currentTime - startTime < 10000 && !connected) {
+        log.info(s"BinaryLogClient:$connected")
+        Thread.sleep(1000)
+      }
 
       connected
     }

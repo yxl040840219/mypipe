@@ -24,12 +24,12 @@ abstract class AbstractBinaryLogConsumer[BinaryLogEvent] extends BinaryLogConsum
   private var binLogPos: Option[BinaryLogFilePosition] = None
 
   protected def handleEvent(binaryLogEvent: BinaryLogEvent): Unit = {
+    log.debug(s"BinaryLogEvent:$binaryLogEvent")
     val event = decodeEvent(binaryLogEvent)
-
     val success = event match {
 
       case Some(e) ⇒ e match {
-        case e: TableContainingEvent if skipEvent(e) ⇒ true
+        case e: TableContainingEvent if skipEvent(e) ⇒ true // 跳过
         case e: AlterEvent                           ⇒ handleAlter(e)
         case e: BeginEvent if groupEventsByTx        ⇒ handleBegin(e)
         case e: CommitEvent if groupEventsByTx       ⇒ handleCommit(e)

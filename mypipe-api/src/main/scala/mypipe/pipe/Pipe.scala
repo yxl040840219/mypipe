@@ -53,7 +53,7 @@ case class Pipe[BinaryLogEvent](id: String, consumer: BinaryLogConsumer[BinaryLo
       state = State.STARTED
       _connected = true
 
-      flusher = Some(system.scheduler.schedule(
+      flusher = Some(system.scheduler.schedule( // 使用 Akka 定时运行
         Conf.FLUSH_INTERVAL_SECS.seconds,
         Conf.FLUSH_INTERVAL_SECS.seconds
       )(flushAndsaveBinaryLogPosition(consumer)))

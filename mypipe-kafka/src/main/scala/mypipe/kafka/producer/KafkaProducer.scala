@@ -6,8 +6,7 @@ import java.util.concurrent.LinkedBlockingQueue
 import java.util.logging.Logger
 
 import org.apache.kafka.common.serialization.{ByteArraySerializer, Serializer}
-import org.apache.kafka.clients.producer.ProducerConfig
-import org.apache.kafka.clients.producer.{ProducerRecord, KafkaProducer ⇒ KProducer}
+import org.apache.kafka.clients.producer.{KafkaProducer ⇒ KProducer, ProducerConfig, ProducerRecord}
 import KafkaMutationAvroProducer.MessageType
 
 import scala.collection.JavaConverters._
@@ -26,6 +25,7 @@ class KafkaProducer[T <: Serializer[MessageType]](metadataBrokers: String, seria
   properties.putAll(producerProperties.asJava)
 
   val producer = new KProducer[KeyType, MessageType](properties)
+
   val queue = new LinkedBlockingQueue[ProducerRecord[KeyType, MessageType]]()
 
   def queue(topic: String, message: MessageType) {
@@ -36,11 +36,16 @@ class KafkaProducer[T <: Serializer[MessageType]](metadataBrokers: String, seria
     queue.add(new ProducerRecord[KeyType, MessageType](topic, messageKey, message))
   }
 
-  def flush: Boolean = {
+  def flush: Boolean = { // 发送数据到 kafka
     val s = new util.ArrayList[ProducerRecord[KeyType, MessageType]]
     queue.drainTo(s)
+    log.info(s"send record to kafka: ${s.size()} records")
     val a = s.toArray[ProducerRecord[KeyType, MessageType]](Array[ProducerRecord[KeyType, MessageType]]())
-    a foreach producer.send
+    val futures = a.map(record ⇒ {
+      val future = producer.send(record)
+      future
+    })
+    futures.map { println }
     true
   }
 }

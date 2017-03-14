@@ -15,7 +15,7 @@ object Lists {
     list.forall(item ⇒ {
       val res = try { listOp(item) } catch {
         case e: Exception ⇒
-          log.error("Unhandled exception while processing list", e)
+          log.error("Unhandled exception while processing list", e.printStackTrace())
           onError(list, item)
       }
 

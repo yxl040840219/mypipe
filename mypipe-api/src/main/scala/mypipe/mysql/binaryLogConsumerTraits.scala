@@ -43,14 +43,16 @@ trait ConfigBasedEventSkippingBehaviour {
 
   val includeEventCond = Conf.INCLUDE_EVENT_CONDITION
 
-  val skipFn: (String, String) ⇒ Boolean =
+  val skipFn: (String, String) ⇒ Boolean = {
     if (includeEventCond.isDefined)
       Eval(s"""{ (db: String, table: String) => { ! ( ${includeEventCond.get} ) } }""")
     else
       (_, _) ⇒ false
+  }
 
   protected def skipEvent(e: TableContainingEvent): Boolean = {
-    skipFn(e.table.db, e.table.name)
+    val boolean = skipFn(e.table.db, e.table.name)
+    boolean
   }
 }
 
@@ -83,7 +85,10 @@ trait ConfigBasedErrorHandlingBehaviour[BinaryLogEvent] extends BinaryLogConsume
     handler.exists(_.handleEventDecodeError(binaryLogEvent))
 
   def handleEmptyCommitError(queryList: List[QueryEvent]): Boolean =
-    handler.exists(_.handleEmptyCommitError(queryList))
+    {
+      handler.exists(_.handleEmptyCommitError(queryList))
+    }
+
 }
 
 class ConfigBasedErrorHandler[BinaryLogEvent] extends BinaryLogConsumerErrorHandler[BinaryLogEvent] {

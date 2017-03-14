@@ -38,7 +38,7 @@ object PipeRunner extends App {
         shuttingDown = true
         pipes.foreach(_.disconnect())
         log.info("Shutting down actor system...")
-        Actors.actorSystem.shutdown()
+        Actors.actorSystem.terminate()
         Actors.actorSystem.awaitTermination()
         log.info("Bye bye...")
       }
@@ -52,7 +52,7 @@ object PipeRunner extends App {
   log.info(s"Connecting ${pipes.size} pipes...")
   pipes.foreach(_.connect())
 
-  shutdown()
+  // shutdown()
 }
 
 object PipeRunnerUtil {
@@ -181,6 +181,7 @@ object PipeRunnerUtil {
       producer
     } catch {
       case e: Exception ⇒
+        println(e.printStackTrace())
         log.error(s"Failed to configure producer $id: ${e.getMessage}\n${e.getStackTrace.mkString("\n")}")
         null
     }

@@ -27,11 +27,12 @@ lazy val apiDependencies = Seq(
   scalaCompiler,
   scalaReflect,
   scalaTest,
-  slf4jApi,
   typesafeConfig
 )
 
 lazy val runnerDependencies = Seq(
+  logback,
+  logback_core,
   typesafeConfig
 )
 
@@ -64,7 +65,10 @@ lazy val avroDependencies = Seq(
 lazy val kafkaDependencies = Seq(
   kafka,
   scalaTest,
-  schemaRepoBundle
+  schemaRepoBundle,
+  jackson_core,
+  jackson_module,
+  jackson_databind
 )
 
 lazy val root = (project in file(".")).
